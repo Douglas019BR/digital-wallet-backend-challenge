@@ -17,7 +17,7 @@ def is_valid_email(email: str) -> bool:
 
 def get_password_hash(password: str) -> str:
     """Hash a password for storing in the database."""
-    return pwd_context.hash(password)git s
+    return pwd_context.hash(password)
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
