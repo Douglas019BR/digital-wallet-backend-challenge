@@ -1,0 +1,46 @@
+import os
+import sys
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+import pytest
+from fastapi.testclient import TestClient
+from sqlalchemy.orm import Session
+from main import app
+from config.database import get_db
+from services.user_service import create_user_service, get_user_by_username_service
+from schemas.user_schema import UserCreate
+
+@pytest.fixture(scope="module")
+def test_client():
+    """Fixture to provide a test client for FastAPI app."""
+    with TestClient(app) as client:
+        yield client
+
+@pytest.fixture(scope="module")
+def test_user():
+    """Fixture to create and delete a test user."""
+    db: Session = next(get_db())
+    existing_user = get_user_by_username_service(db, username="testuser")
+    if existing_user:
+        yield existing_user
+    else:
+        test_user_data = UserCreate(
+            username="testuser",
+            email="testuser@example.com",
+            password="testpassword",
+            is_admin=False,
+            is_active=True
+        )
+        test_user = create_user_service(db=db, user=test_user_data)
+        yield test_user
+
+@pytest.fixture(scope="module")
+def valid_token(test_client, test_user):
+    """Fixture to provide a valid token for authentication."""
+    response = test_client.post(
+        "/login/",
+        json={"username": test_user.username, "password": "testpassword"},
+    )
+    assert response.status_code == 200
+    return response.json()["access_token"]

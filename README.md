@@ -82,3 +82,6 @@ docker-compose exec web alembic upgrade head
 
 # Aplicar o seed
 docker-compose exec web python seeds/create_admin_user.py
+
+# Rodar testes
+docker-compose exec web pytest -svv
