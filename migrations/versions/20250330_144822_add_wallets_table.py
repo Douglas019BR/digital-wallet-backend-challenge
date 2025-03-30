@@ -5,15 +5,15 @@ Revises: 20240626_000000
 Create Date: 2025-03-30 14:48:22.733498
 
 """
+
 from typing import Sequence, Union
 
-from alembic import op
 import sqlalchemy as sa
-
+from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = '5536f20c5a77'
-down_revision: Union[str, None] = '20240626_000000'
+revision: str = "5536f20c5a77"
+down_revision: Union[str, None] = "20240626_000000"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -24,7 +24,10 @@ def upgrade() -> None:
         "wallets",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("user_id", sa.Integer(), nullable=False),
-        sa.Column("balance", sa.Numeric(precision=10, scale=2), nullable=False),        sa.Column("currency", sa.String(), nullable=False, default="BRL"),
+        sa.Column(
+            "balance", sa.Numeric(precision=10, scale=2), nullable=False
+        ),
+        sa.Column("currency", sa.String(), nullable=False, default="BRL"),
         sa.Column("created_at", sa.DateTime(), nullable=True),
         sa.Column("updated_at", sa.DateTime(), nullable=True),
         sa.ForeignKeyConstraint(["user_id"], ["users.id"]),
