@@ -1,4 +1,5 @@
 ruff==0.11.2
 isort==6.0.1
+ipdb==0.13.13
 
 -r requirements.txt
