@@ -72,3 +72,13 @@ For local development, you can use Python's virtual environment:
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
+
+
+# Subir novamente
+docker-compose up -d
+
+# Executar as migrações
+docker-compose exec web alembic upgrade head
+
+# Aplicar o seed
+docker-compose exec web python seeds/create_admin_user.py
