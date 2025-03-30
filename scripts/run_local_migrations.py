@@ -9,14 +9,16 @@ def run_local_migrations():
     """Execute migrations on a local database connection."""
     # Store original DATABASE_URL
     original_db_url = os.environ.get("DATABASE_URL", "")
-    
+
     try:
         # Set the DATABASE_URL to a local connection
         # Modify this to match your local database credentials
-        os.environ["DATABASE_URL"] = "postgresql://postgres:password@localhost:5432/digital-wallet"
-        
+        os.environ["DATABASE_URL"] = (
+            "postgresql://postgres:password@localhost:5432/digital-wallet"
+        )
+
         print(f"Using local database connection: {os.environ['DATABASE_URL']}")
-        
+
         # Run the migrations
         result = subprocess.run(["alembic", "upgrade", "head"], check=True)
         print("Migrations executed successfully!")
