@@ -17,7 +17,7 @@ user_router = APIRouter()
 def create_user(
     user_data: UserCreate,
     db: Session = Depends(get_db),
-    current_user=Depends(get_current_user()),
+    current_user=Depends(get_current_user),
 ):
     try:
         new_user = create_user_service(db=db, user=user_data)
