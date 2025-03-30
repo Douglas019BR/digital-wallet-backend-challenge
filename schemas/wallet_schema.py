@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class WalletBase(BaseModel):
@@ -21,3 +21,13 @@ class WalletResponse(WalletBase):
     class Config:
         orm_mode = True
         json_encoders = {datetime: lambda dt: dt.isoformat() if dt else None}
+
+
+class TransferRequest(BaseModel):
+    destination_wallet_id: int
+    amount: float = Field(..., gt=0)
+
+
+class BalanceResponse(BaseModel):
+    message: str
+    balance: float

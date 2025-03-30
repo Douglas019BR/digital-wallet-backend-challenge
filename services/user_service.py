@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from models.user import User
 from schemas.user_schema import UserCreate
+from services.wallet_service import create_wallet_service
 
 
 def is_valid_email(email: str) -> bool:
@@ -46,7 +47,6 @@ def get_users_service(
 
 
 def create_user_service(db: Session, user: UserCreate) -> User:
-    hashed_password = get_password_hash(user.password)
     if not is_valid_email(user.email):
         raise ValueError("Invalid email format")
     if get_user_by_email_service(db, user.email):
@@ -54,17 +54,29 @@ def create_user_service(db: Session, user: UserCreate) -> User:
     if get_user_by_username_service(db, user.username):
         raise ValueError("Username already taken")
 
-    db_user = User(
-        email=user.email,
-        username=user.username,
-        password=hashed_password,
-        is_admin=user.is_admin if user.is_admin else False,
-        is_active=user.is_active if user.is_active else True,
-        parent_id=user.parent_id if user.parent_id else None,
-    )
-    if not db_user:
-        raise ValueError("Invalid user data")
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
+    hashed_password = get_password_hash(user.password)
+
+    try:
+        db_user = User(
+            email=user.email,
+            username=user.username,
+            password=hashed_password,
+            is_admin=user.is_admin if user.is_admin else False,
+            is_active=user.is_active if user.is_active else True,
+            parent_id=user.parent_id if user.parent_id else None,
+        )
+
+        db.add(db_user)
+        db.flush()
+
+        wallet_id = create_wallet_service(db, db_user.id)
+        if not wallet_id:
+            raise ValueError("Failed to create wallet")
+
+        db.commit()
+        db.refresh(db_user)
+        return db_user
+
+    except Exception as err:
+        db.rollback()
+        raise err
