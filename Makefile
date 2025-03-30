@@ -18,7 +18,7 @@ migrate:
 	docker-compose exec web alembic upgrade head
 
 seed:
-	docker-compose exec web python seeds/create_admin_user.py
+	docker-compose exec web python seeds/create_seed.py
 
 test:
 	docker-compose exec web pytest -svv
