@@ -6,16 +6,31 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
-from main import app
+
 from config.database import get_db
-from services.user_service import create_user_service, get_user_by_username_service
+from main import app
 from schemas.user_schema import UserCreate
+from services.user_service import (
+    create_user_service,
+    get_user_by_username_service,
+)
+
+
+@pytest.fixture
+def db_session():
+    db = next(get_db())
+    try:
+        yield db
+    finally:
+        db.close()
+
 
 @pytest.fixture(scope="module")
 def test_client():
     """Fixture to provide a test client for FastAPI app."""
     with TestClient(app) as client:
         yield client
+
 
 @pytest.fixture(scope="module")
 def test_user():
@@ -30,10 +45,11 @@ def test_user():
             email="testuser@example.com",
             password="testpassword",
             is_admin=False,
-            is_active=True
+            is_active=True,
         )
         test_user = create_user_service(db=db, user=test_user_data)
         yield test_user
+
 
 @pytest.fixture(scope="module")
 def valid_token(test_client, test_user):
