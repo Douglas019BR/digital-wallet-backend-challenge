@@ -14,9 +14,9 @@ class User(Base):
     username = Column(String, unique=True, index=True)
     password = Column(String, nullable=False)
     email = Column(String, unique=True, index=True)
-    is_admin = Column(Boolean, default=False)
-    is_active = Column(Boolean, default=True)
-    parent_id = Column(Integer, nullable=True)
+    is_admin = Column(Boolean, default=False)  # for future features
+    is_active = Column(Boolean, default=True)  # for future features
+    parent_id = Column(Integer, nullable=True)  # for future features
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(
         DateTime, default=datetime.utcnow, onupdate=datetime.utcnow

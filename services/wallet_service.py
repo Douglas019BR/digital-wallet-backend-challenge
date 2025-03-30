@@ -8,13 +8,15 @@ def get_wallet_service(db: Session, wallet_id: int) -> Wallet | None:
     return db.query(Wallet).filter(Wallet.id == wallet_id).first()
 
 
-def create_wallet_service(db: Session, user_id: int) -> int:
+def create_wallet_service(
+    db: Session, user_id: int, currency: str = "BRL"
+) -> int:
     # It's necessary commit db after call it
     try:
         db_wallet = Wallet(
             user_id=user_id,
             balance=0.0,
-            currency="BRL",
+            currency=currency,
         )
         db.add(db_wallet)
         db.flush()
@@ -52,6 +54,8 @@ def transfer_balance_service(
         raise Exception("Source wallet not found")
     if source_wallet.user_id != current_user.id:
         raise Exception("Source wallet doesn't belong to you")
+    if source_wallet.id == destination_wallet_id:
+        raise Exception("Cannot transfer to the same wallet")
     if source_wallet.balance < amount:
         raise Exception("Insufficient balance for transfer")
 

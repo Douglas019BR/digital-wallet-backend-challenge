@@ -4,11 +4,8 @@ from sqlalchemy.orm import Session
 from config.database import get_db
 from controllers.auth_controller import get_current_user
 from schemas.user_schema import UserCreate, UserResponse
-from services.user_service import (
-    create_user_service,
-    get_user_service,
-    get_users_service,
-)
+from services.user_service import (create_user_service, get_user_service,
+                                   get_users_service)
 
 user_router = APIRouter()
 

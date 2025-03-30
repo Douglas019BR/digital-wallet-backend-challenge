@@ -10,7 +10,7 @@ app = FastAPI()
 
 app.include_router(user_router, prefix="/users", tags=["users"])
 app.include_router(login_router, prefix="/login", tags=["login"])
-app.include_router(wallet_router, prefix="/wallet", tags=["wallets"])
+app.include_router(wallet_router, prefix="/wallets", tags=["wallets"])
 
 
 @app.get("/health")

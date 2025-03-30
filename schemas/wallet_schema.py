@@ -23,6 +23,10 @@ class WalletResponse(WalletBase):
         json_encoders = {datetime: lambda dt: dt.isoformat() if dt else None}
 
 
+class DepositRequest(BaseModel):
+    amount: float = Field(..., gt=0)
+
+
 class TransferRequest(BaseModel):
     destination_wallet_id: int
     amount: float = Field(..., gt=0)

@@ -12,7 +12,9 @@ class Wallet(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     balance = Column(Float, nullable=False)
-    currency = Column(String, nullable=False, default="BRL")
+    currency = Column(
+        String, nullable=False, default="BRL"
+    )  # for future features
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(
         DateTime, default=datetime.utcnow, onupdate=datetime.utcnow

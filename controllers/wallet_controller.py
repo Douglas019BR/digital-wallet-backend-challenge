@@ -4,22 +4,16 @@ from sqlalchemy.orm import Session
 from config.database import get_db
 from controllers.auth_controller import get_current_user
 from models.user import User
-from schemas.wallet_schema import (
-    BalanceResponse,
-    TransferRequest,
-    WalletResponse,
-)
-from services.wallet_service import (
-    add_balance_service,
-    get_wallet_service,
-    transfer_balance_service,
-)
+from schemas.wallet_schema import (BalanceResponse, DepositRequest,
+                                   TransferRequest, WalletResponse)
+from services.wallet_service import (add_balance_service, get_wallet_service,
+                                     transfer_balance_service)
 
-router = APIRouter(prefix="/wallets", tags=["wallets"])
+router = APIRouter()
 
 
-@router.get("/{wallet_id}", response_model=WalletResponse)
-def get_wallet(
+@router.get("/{wallet_id}/balance", response_model=BalanceResponse)
+def get_wallet_balance(
     wallet_id: int,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
@@ -35,25 +29,27 @@ def get_wallet(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You don't have access to this wallet",
         )
-
-    return wallet
+    message = "Balance :  "
+    return BalanceResponse(message=message, balance=wallet.balance)
 
 
 @router.post("/{wallet_id}/add-balance", response_model=BalanceResponse)
 def add_balance(
     wallet_id: int,
-    amount: float,
+    deposit_data: DepositRequest,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     try:
-        if amount <= 0:
+        if deposit_data.amount <= 0:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Amount must be greater than zero",
             )
 
-        wallet = add_balance_service(db, wallet_id, current_user, amount)
+        wallet = add_balance_service(
+            db, wallet_id, current_user, deposit_data.amount
+        )
         message = "The new balance is "
 
         return BalanceResponse(message=message, balance=wallet.balance)

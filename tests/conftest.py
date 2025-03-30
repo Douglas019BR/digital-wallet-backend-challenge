@@ -10,10 +10,8 @@ from sqlalchemy.orm import Session
 from config.database import get_db
 from main import app
 from schemas.user_schema import UserCreate
-from services.user_service import (
-    create_user_service,
-    get_user_by_username_service,
-)
+from services.user_service import (create_user_service,
+                                   get_user_by_username_service)
 
 
 @pytest.fixture
