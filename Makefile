@@ -11,6 +11,9 @@ down:
 
 restart: down up
 
+requirements:
+	docker-compose exec web pip install -r requirements-dev.txt
+
 migrate:
 	docker-compose exec web alembic upgrade head
 

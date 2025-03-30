@@ -1,6 +1,6 @@
 import re
-import bcrypt
 
+import bcrypt
 from sqlalchemy.orm import Session
 
 from models.user import User
@@ -15,12 +15,16 @@ def is_valid_email(email: str) -> bool:
 
 def get_password_hash(password: str) -> str:
     """Hash a password for storing in the database."""
-    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode(
+        "utf-8"
+    )
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify that a plain password matches the stored hashed password."""
-    return bcrypt.hashpw(plain_password.encode("utf-8"), hashed_password.encode("utf-8")) == hashed_password.encode("utf-8")
+    return bcrypt.hashpw(
+        plain_password.encode("utf-8"), hashed_password.encode("utf-8")
+    ) == hashed_password.encode("utf-8")
 
 
 def get_user_service(db: Session, user_id: int) -> User | None:

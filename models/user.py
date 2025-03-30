@@ -2,7 +2,7 @@ from datetime import datetime
 
 from sqlalchemy import Boolean, Column, DateTime, Integer, String
 from sqlalchemy.orm import relationship
-
+from models.wallet import Wallet
 from config.database import Base
 
 
@@ -20,6 +20,8 @@ class User(Base):
     updated_at = Column(
         DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
     )
+
+    wallets = relationship("Wallet", back_populates="user", cascade="all, delete-orphan", lazy="joined")
 
     # history_transactions = relationship(
     #     "HistoryTransaction",
