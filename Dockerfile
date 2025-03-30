@@ -17,6 +17,7 @@ RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
 COPY . .
+COPY alembic.ini /app/alembic.ini
 
 # Stage 2: Final image
 FROM python:3.12-slim
