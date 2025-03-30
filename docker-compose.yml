@@ -27,6 +27,8 @@ services:
       DATABASE_URL: postgresql://postgres:password@db:5432/digital-wallet
     ports:
       - "8000:8000"
+    volumes:
+      - .:/home/fastapiuser/app  # Mount local code for hot reload
     depends_on:
       db:
         condition: service_healthy
