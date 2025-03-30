@@ -1,12 +1,10 @@
 import re
+import bcrypt
 
-from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
 from models.user import User
 from schemas.user_schema import UserCreate
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def is_valid_email(email: str) -> bool:
@@ -17,12 +15,12 @@ def is_valid_email(email: str) -> bool:
 
 def get_password_hash(password: str) -> str:
     """Hash a password for storing in the database."""
-    return pwd_context.hash(password)
+    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify that a plain password matches the stored hashed password."""
-    return pwd_context.verify(plain_password, hashed_password)
+    return bcrypt.hashpw(plain_password.encode("utf-8"), hashed_password.encode("utf-8")) == hashed_password.encode("utf-8")
 
 
 def get_user_service(db: Session, user_id: int) -> User | None:

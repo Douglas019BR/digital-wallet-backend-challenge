@@ -21,11 +21,11 @@ class User(Base):
         DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
     )
 
-    history_transactions = relationship(
-        "HistoryTransaction",
-        back_populates="user",
-        foreign_keys="HistoryTransaction.user_id",
-    )
-    source_transactions = relationship(
-        "HistoryTransaction", foreign_keys="HistoryTransaction.source_user_id"
-    )
+    # history_transactions = relationship(
+    #     "HistoryTransaction",
+    #     back_populates="user",
+    #     foreign_keys="HistoryTransaction.user_id",
+    # )
+    # source_transactions = relationship(
+    #     "HistoryTransaction", foreign_keys="HistoryTransaction.source_user_id"
+    # )
