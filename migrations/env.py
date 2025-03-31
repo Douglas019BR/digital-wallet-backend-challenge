@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 from sqlalchemy import engine_from_config, pool
 
 from config.database import Base
-from models.user import User
 
 # Importar outros modelos aqui quando necessário, por exemplo:
 # from models.wallet import Wallet

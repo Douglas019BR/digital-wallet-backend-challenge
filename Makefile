@@ -17,6 +17,10 @@ requirements:
 migrate:
 	docker-compose exec web alembic upgrade head
 
+create-migration:
+	@read -p "Enter migration name: " name; \
+	docker-compose exec web alembic revision --autogenerate -m "$$name"
+
 seed:
 	docker-compose exec web python seeds/create_seed.py
 

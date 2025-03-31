@@ -1,28 +1,48 @@
-# from datetime import datetime
+import enum
+from datetime import datetime
 
-# from sqlalchemy import Column, DateTime, Float, ForeignKey, Integer, String
-# from sqlalchemy.orm import relationship
+from sqlalchemy import Column, DateTime, Float, ForeignKey, Integer
+from sqlalchemy.orm import relationship
 
-# from config.database import Base
+from config.database import Base
 
 
-# class HistoryTransaction(Base):
-#     __tablename__ = "history_transactions"
+class TransactionType(enum.IntEnum):
+    DEPOSIT = 0
+    WITHDRAW = 1
+    TRANSFER = 2
 
-#     id = Column(Integer, primary_key=True, index=True)
-#     wallet_id = Column(Integer, ForeignKey("wallets.id"), nullable=False)
-#     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-#     source_user_id = Column(
-#         Integer, ForeignKey("users.id"), nullable=True
-#     )  # Nullable for deposits and withdraw
-#     transaction_type = Column(
-#         String, nullable=False
-#     )  # 'deposit', 'withdraw', or 'transfer'
-#     amount = Column(Float, nullable=False)
-#     created_at = Column(DateTime, default=datetime.utcnow)
+    @classmethod
+    def as_str(cls, value):
+        """Convert enum value to readable string"""
+        mapping = {
+            cls.DEPOSIT: "deposit",
+            cls.WITHDRAW: "withdraw",
+            cls.TRANSFER: "transfer",
+        }
+        return mapping.get(value, "unknown")
 
-#     wallet = relationship("Wallet", back_populates="history_transactions")
-#     user = relationship(
-#         "User", foreign_keys=[user_id], back_populates="history_transactions"
-#     )
-#     source_user = relationship("User", foreign_keys=[source_user_id])
+
+class HistoryTransaction(Base):
+    __tablename__ = "history_transactions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    wallet_id = Column(Integer, ForeignKey("wallets.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    source_user_id = Column(
+        Integer, ForeignKey("users.id"), nullable=True
+    )  # Nullable for deposits and withdraw
+    transaction_type = Column(Integer, nullable=False)
+    amount = Column(Float, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    wallet = relationship("Wallet", back_populates="history_transactions")
+    user = relationship(
+        "User", foreign_keys=[user_id], back_populates="history_transactions"
+    )
+    source_user = relationship("User", foreign_keys=[source_user_id])
+
+    @property
+    def transaction_type_name(self):
+        """Return the string representation of the transaction type"""
+        return TransactionType.as_str(self.transaction_type)

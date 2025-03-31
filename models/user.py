@@ -4,7 +4,6 @@ from sqlalchemy import Boolean, Column, DateTime, Integer, String
 from sqlalchemy.orm import relationship
 
 from config.database import Base
-from models.wallet import Wallet
 
 
 class User(Base):
@@ -29,11 +28,11 @@ class User(Base):
         lazy="joined",
     )
 
-    # history_transactions = relationship(
-    #     "HistoryTransaction",
-    #     back_populates="user",
-    #     foreign_keys="HistoryTransaction.user_id",
-    # )
-    # source_transactions = relationship(
-    #     "HistoryTransaction", foreign_keys="HistoryTransaction.source_user_id"
-    # )
+    history_transactions = relationship(
+        "HistoryTransaction",
+        back_populates="user",
+        foreign_keys="HistoryTransaction.user_id",
+    )
+    source_transactions = relationship(
+        "HistoryTransaction", foreign_keys="HistoryTransaction.source_user_id"
+    )

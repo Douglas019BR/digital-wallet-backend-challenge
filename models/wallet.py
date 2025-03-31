@@ -21,3 +21,8 @@ class Wallet(Base):
     )
 
     user = relationship("User", back_populates="wallets")
+    history_transactions = relationship(
+        "HistoryTransaction",
+        back_populates="wallet",
+        cascade="all, delete-orphan",
+    )
