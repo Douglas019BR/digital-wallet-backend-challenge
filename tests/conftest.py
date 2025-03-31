@@ -64,13 +64,15 @@ def valid_token(test_client, test_user):
 def test_another_user():
     """Fixture to create and delete a test user."""
     db: Session = next(get_db())
-    existing_user = get_user_by_username_service(db, username="testuser")
+    existing_user = get_user_by_username_service(
+        db, username="anothertestuser"
+    )
     if existing_user:
         yield existing_user
     else:
         test_user_data = UserCreate(
-            username="testuser",
-            email="testuser@example.com",
+            username="anothertestuser",
+            email="anothertestuser@example.com",
             password="testpassword",
             is_admin=False,
             is_active=True,

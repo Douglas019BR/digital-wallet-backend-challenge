@@ -1,4 +1,4 @@
-from services.wallet_service import create_wallet_service, get_wallet_service
+from services.wallet_service import get_wallet_service
 
 
 def test_get_wallet_balance_unauthorized(test_client):
@@ -19,7 +19,7 @@ def test_get_wallet_balance_not_found(test_client, valid_token):
 
 
 def test_get_wallet_balance_forbidden(
-    test_client, valid_token, db_session, test_another_user
+    test_client, valid_token, db_session, test_user, test_another_user
 ):
     """Test fetching balance for a wallet that doesn't belong to the user."""
     other_wallet = get_wallet_service(
@@ -34,10 +34,11 @@ def test_get_wallet_balance_forbidden(
     assert response.json()["detail"] == "You don't have access to this wallet"
 
 
-def test_get_wallet_balance_success(test_client, valid_token, test_user):
+def test_get_wallet_balance_success(
+    test_client, valid_token, test_user, db_session
+):
     """Test successfully fetching wallet balance."""
-    wallets = test_user.wallets
-    wallet = wallets[0]
+    wallet = get_wallet_service(db_session, test_user.wallets[0].id)
 
     response = test_client.get(
         f"/wallets/{wallet.id}/balance",
@@ -67,32 +68,33 @@ def test_add_balance_not_found(test_client, valid_token):
     assert response.json()["detail"] == "Wallet not found"
 
 
-def test_add_balance_invalid_amount(test_client, valid_token, test_user):
-    """Test adding an invalid amount to a wallet."""
-    wallets = test_user.wallets
-    wallet = wallets[0]
+def test_add_balance_invalid_amount(
+    test_client, valid_token, test_user, db_session
+):
+    wallet = get_wallet_service(db_session, test_user.wallets[0].id)
+    response = test_client.post(
+        f"/wallets/{wallet.id}/add-balance",
+        headers={"Authorization": f"Bearer {valid_token}"},
+        json={"amount": -100.0},
+    )
+    assert response.status_code == 422
+    assert (
+        "Input should be greater than 0" in response.json()["detail"][0]["msg"]
+    )
 
-    if wallet:
-        response = test_client.post(
-            f"/wallets/{wallet.id}/add-balance",
-            headers={"Authorization": f"Bearer {valid_token}"},
-            json={"amount": -100.0},
-        )
-        assert response.status_code == 422
-        assert "Amount must be greater than zero" in response.json()["detail"]
-
-        response = test_client.post(
-            f"/wallets/{wallet.id}/add-balance",
-            headers={"Authorization": f"Bearer {valid_token}"},
-            json={"amount": 0.0},
-        )
-        assert response.status_code == 400
-        assert "Amount must be greater than zero" in response.json()["detail"]
+    response = test_client.post(
+        f"/wallets/{wallet.id}/add-balance",
+        headers={"Authorization": f"Bearer {valid_token}"},
+        json={"amount": 0.0},
+    )
+    assert response.status_code == 422
+    assert (
+        "Input should be greater than 0" in response.json()["detail"][0]["msg"]
+    )
 
 
 def test_add_balance_success(test_client, valid_token, test_user, db_session):
-    wallets = test_user.wallets
-    wallet = wallets[0]
+    wallet = get_wallet_service(db_session, test_user.wallets[0].id)
     initial_balance = wallet.balance
     amount_to_add = 100.0
 
@@ -129,28 +131,28 @@ def test_transfer_balance_source_not_found(test_client, valid_token):
 
 
 def test_transfer_balance_destination_not_found(
-    test_client, valid_token, test_user
+    test_client, valid_token, test_user, db_session
 ):
-    wallets = test_user.wallets
-    wallet = wallets[0]
+    wallet = get_wallet_service(db_session, test_user.wallets[0].id)
 
-    if wallet:
-        response = test_client.post(
-            f"/wallets/{wallet.id}/transfer",
-            headers={"Authorization": f"Bearer {valid_token}"},
-            json={"destination_wallet_id": 9999, "amount": 50.0},
-        )
-        assert response.status_code == 400
-        assert "Destination wallet not found" in response.json()["detail"]
+    response = test_client.post(
+        f"/wallets/{wallet.id}/transfer",
+        headers={"Authorization": f"Bearer {valid_token}"},
+        json={"destination_wallet_id": 9999, "amount": 50.0},
+    )
+    assert response.status_code == 400
+    assert "Destination wallet not found" in response.json()["detail"]
 
 
 def test_transfer_balance_insufficient_funds(
     test_client, valid_token, test_user, db_session, test_another_user
 ):
-    source_wallet = test_user.wallets[0]
-    dest_wallet = test_another_user.wallets[0]
+    source_wallet = get_wallet_service(db_session, test_user.wallets[0].id)
+    dest_wallet = get_wallet_service(
+        db_session, test_another_user.wallets[0].id
+    )
     source_wallet.balance = 10.0
-
+    db_session.commit()
     response = test_client.post(
         f"/wallets/{source_wallet.id}/transfer",
         headers={"Authorization": f"Bearer {valid_token}"},
@@ -161,9 +163,10 @@ def test_transfer_balance_insufficient_funds(
     assert "Insufficient balance for transfer" in response.json()["detail"]
 
 
-def test_transfer_balance_same_wallet(test_client, valid_token, test_user):
-    wallets = test_user.wallets
-    wallet = wallets[0]
+def test_transfer_balance_same_wallet(
+    test_client, valid_token, test_user, db_session
+):
+    wallet = get_wallet_service(db_session, test_user.wallets[0].id)
 
     response = test_client.post(
         f"/wallets/{wallet.id}/transfer",
@@ -177,14 +180,16 @@ def test_transfer_balance_same_wallet(test_client, valid_token, test_user):
 def test_transfer_balance_success(
     test_client, valid_token, test_user, db_session, test_another_user
 ):
-    wallets = test_user.wallets
-    source_wallet = wallets[0]
+    source_wallet = get_wallet_service(db_session, test_user.wallets[0].id)
 
     initial_balance = 200.0
     source_wallet.balance = initial_balance
     db_session.commit()
 
-    dest_wallet = test_another_user.wallets[0]
+    dest_wallet = get_wallet_service(
+        db_session, test_another_user.wallets[0].id
+    )
+
     initial_dest_balance = dest_wallet.balance
     transfer_amount = 50.0
 

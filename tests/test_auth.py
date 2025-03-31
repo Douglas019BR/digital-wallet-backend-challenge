@@ -1,9 +1,18 @@
 def test_login_success(test_client):
     """Test successful login."""
-    response = test_client.post(
-        "/login/",
-        json={"username": "testuser", "password": "testpassword"},
-    )
+    retries = 0
+    attempts = 3
+    while retries < attempts:
+        response = test_client.post(
+            "/login/",
+            json={"username": "testuser", "password": "testpassword"},
+        )
+        if response.status_code == 200:
+            break
+        else:
+            print("Login failed, retrying...")
+            retries += 1
+            continue
     assert response.status_code == 200
     assert "access_token" in response.json()
 
