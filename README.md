@@ -1,87 +1,86 @@
-# FastApiBoilerPlate
+# Digital Wallet Backend Challenge
 
-Original challenge : [repositorio](https://github.com/WL-Consultings/challenges/tree/main/backend) 
+This project implements a backend API for a digital wallet system using FastAPI and PostgreSQL containerized with Docker. The system allows for user management, authentication, and wallet operations.
 
-## Prerequisites
+## [Original Challenge](https://github.com/WL-Consultings/challenges/tree/main/backend)
 
-- [Docker](https://www.docker.com/) installed on your machine.
-- [Docker Compose](https://docs.docker.com/compose/) installed.
+## Justifications 
+<!-- alterar -->
+This implementation focuses on clean architecture, separation of concerns, and testability. The project uses FastAPI for its performance benefits and automatic documentation generation, SQLAlchemy for database operations, and Docker for consistent development and deployment environments.
 
-## Configuration
+## 📋 Table of Contents
 
-1. Rename the `.env.template` file to `.env` and configure the environment variables as needed.
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+- [Additional Features](#additional-features)
+- [License](#license)
 
-2. Ensure that the dependencies are correctly listed in the `requirements.txt` and `requirements-dev.txt` files.
+## ✨ Features
+- User registration and authentication
+- Secure password handling with bcrypt
+- JWT-based authentication
+- Wallet management (create, deposit, withdraw, transfer)
+- Transaction history tracking
+- Database migrations with Alembic
+- Containerized with Docker
+- Comprehensive test suite
 
-## How to Run with Docker
+## 🛠️ Tech Stack
 
-1. **Build the Docker image**:
-   ```bash
-   docker build -t fastapi-boilerplate .
-   ```
+- ![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi) High-performance web framework for building APIs
+- ![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-CC2927?style=for-the-badge&logo=sqlalchemy&logoColor=white) SQL toolkit and ORM
+- ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white) Relational database
+- ![Alembic](https://img.shields.io/badge/Alembic-2D3B4D?style=for-the-badge) Database migration tool
+- ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white) Containerization
+- ![Pydantic](https://img.shields.io/badge/Pydantic-E92063?style=for-the-badge&logo=pydantic&logoColor=white) Data validation and settings management
+- ![Pytest](https://img.shields.io/badge/Pytest-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white) Testing framework
+- ![Ruff](https://img.shields.io/badge/Ruff-000000?style=for-the-badge) & ![isort](https://img.shields.io/badge/isort-3776AB?style=for-the-badge) Code formatting and import sorting
 
-2. **Run the container**:
-   ```bash
-   docker run -d --name fastapi-app -p 8000:8000 fastapi-boilerplate
-   ```
+## 🚀 Getting Started
 
-3. **Access the application**:
-   - Open the application in your browser at: [http://localhost:8000](http://localhost:8000)
-   - Access the interactive API documentation at: [http://localhost:8000/docs](http://localhost:8000/docs)
+### Prerequisites
 
-## How to Run with Docker Compose
+- Docker and Docker Compose
+- Make (optional, for using Makefile commands)
 
-1. **Start the services**:
-   ```bash
-   docker-compose up -d
-   ```
+### Installation
 
-2. **Access the application**:
-   - Open the application in your browser at: [http://localhost:8000](http://localhost:8000)
-   - Access the interactive API documentation at: [http://localhost:8000/docs](http://localhost:8000/docs)
+1. Clone the repository
+```bash
+git clone <repository-url>
+cd digital-wallet-backend-challenge
+```
 
-## Development
+2. Create a .env file from the template
+```bash
+cp .env.template .env
+```
 
-For local development, you can use Python's virtual environment:
+3. Build and start the containers
+```bash
+make build
+make up
+```
 
-1. Create a virtual environment:
-   ```bash
-   python -m venv venv
-   ```
+4. Run database migrations
+```bash
+make migrate
+```
 
-2. Activate the virtual environment:
-   - On Linux/Mac:
-     ```bash
-     source venv/bin/activate
-     ```
-   - On Windows:
-     ```bash
-     venv\Scripts\activate
-     ```
+5. (Optional) Seed the database with initial data
+```bash
+make seed
+```
 
-3. Install the dependencies:
-   ```bash
-   pip install -r requirements-dev.txt
-   ```
+6. The API will be available at http://localhost:8000
 
-4. Run the local server:
-   ```bash
-   uvicorn main:app --reload
-   ```
+## Additional Features
+Check for additional commands in the Makefile [Makefile]
 
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
 
-
-# Subir novamente
-docker-compose up -d
-
-# Executar as migrações
-docker-compose exec web alembic upgrade head
-
-# Aplicar o seed
-docker-compose exec web python seeds/create_admin_user.py
-
-# Rodar testes
-docker-compose exec web pytest -svv
