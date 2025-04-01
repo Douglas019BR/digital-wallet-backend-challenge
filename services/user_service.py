@@ -1,8 +1,11 @@
 import re
+from datetime import datetime
 
 import bcrypt
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
+from models.history_transactions import HistoryTransaction, TransactionType
 from models.user import User
 from schemas.user_schema import UserCreate
 from services.wallet_service import create_wallet_service
@@ -80,3 +83,49 @@ def create_user_service(db: Session, user: UserCreate) -> User:
     except Exception as err:
         db.rollback()
         raise err
+
+
+def get_user_transactions_service(
+    db: Session,
+    user_id: int,
+    transaction_type: int = None,
+    start_date: datetime = None,
+    end_date: datetime = None,
+) -> list[dict]:
+    query = db.query(HistoryTransaction).filter(
+        or_(
+            HistoryTransaction.source_user_id == user_id,
+            HistoryTransaction.destination_user_id == user_id,
+        )
+    )
+
+    if transaction_type is not None:
+        query = query.filter(
+            HistoryTransaction.transaction_type == transaction_type
+        )
+
+    if start_date:
+        query = query.filter(HistoryTransaction.created_at >= start_date)
+
+    if end_date:
+        query = query.filter(HistoryTransaction.created_at <= end_date)
+
+    transactions = query.order_by(HistoryTransaction.created_at.desc()).all()
+
+    result = []
+    for transaction in transactions:
+        transaction_dict = {
+            "id": transaction.id,
+            "transaction_type": transaction.transaction_type,
+            "amount": transaction.amount,
+            "source_user_id": transaction.source_user_id,
+            "destination_user_id": transaction.destination_user_id,
+            "created_at": transaction.created_at,
+            "is_receiver": (
+                transaction.transaction_type == TransactionType.TRANSFER
+                and transaction.destination_user_id == user_id
+            ),
+        }
+        result.append(transaction_dict)
+
+    return result
