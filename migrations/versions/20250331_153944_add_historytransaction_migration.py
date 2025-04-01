@@ -10,7 +10,6 @@ from typing import Sequence, Union
 
 import sqlalchemy as sa
 from alembic import op
-from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision: str = "97bdd245c5ce"
@@ -25,8 +24,8 @@ def upgrade() -> None:
         "history_transactions",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("wallet_id", sa.Integer(), nullable=False),
-        sa.Column("user_id", sa.Integer(), nullable=False),
-        sa.Column("source_user_id", sa.Integer(), nullable=True),
+        sa.Column("source_user_id", sa.Integer(), nullable=False),
+        sa.Column("destination_user_id", sa.Integer(), nullable=True),
         sa.Column(
             "transaction_type", sa.Integer(), nullable=False
         ),  # Use integer instead of enum
@@ -37,7 +36,7 @@ def upgrade() -> None:
             ["users.id"],
         ),
         sa.ForeignKeyConstraint(
-            ["user_id"],
+            ["destination_user_id"],
             ["users.id"],
         ),
         sa.ForeignKeyConstraint(

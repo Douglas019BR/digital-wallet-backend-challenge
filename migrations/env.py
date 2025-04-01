@@ -7,10 +7,6 @@ from sqlalchemy import engine_from_config, pool
 
 from config.database import Base
 
-# Importar outros modelos aqui quando necessário, por exemplo:
-# from models.wallet import Wallet
-# from models.history_transactions import HistoryTransaction
-
 # Carregar variáveis de ambiente
 load_dotenv()
 

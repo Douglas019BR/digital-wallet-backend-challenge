@@ -28,8 +28,8 @@ class HistoryTransaction(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     wallet_id = Column(Integer, ForeignKey("wallets.id"), nullable=False)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    source_user_id = Column(
+    source_user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    destination_user_id = Column(
         Integer, ForeignKey("users.id"), nullable=True
     )  # Nullable for deposits and withdraw
     transaction_type = Column(Integer, nullable=False)
@@ -37,10 +37,16 @@ class HistoryTransaction(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     wallet = relationship("Wallet", back_populates="history_transactions")
-    user = relationship(
-        "User", foreign_keys=[user_id], back_populates="history_transactions"
+    destination_user = relationship(
+        "User",
+        foreign_keys=[destination_user_id],
+        back_populates="destination_transactions",
     )
-    source_user = relationship("User", foreign_keys=[source_user_id])
+    source_user = relationship(
+        "User",
+        foreign_keys=[source_user_id],
+        back_populates="source_transactions",
+    )
 
     @property
     def transaction_type_name(self):

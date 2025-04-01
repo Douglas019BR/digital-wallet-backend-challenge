@@ -28,11 +28,15 @@ class User(Base):
         lazy="joined",
     )
 
-    history_transactions = relationship(
+    destination_transactions = relationship(
         "HistoryTransaction",
-        back_populates="user",
-        foreign_keys="HistoryTransaction.user_id",
+        back_populates="destination_user",
+        foreign_keys="HistoryTransaction.destination_user_id",
+        lazy="joined",
     )
     source_transactions = relationship(
-        "HistoryTransaction", foreign_keys="HistoryTransaction.source_user_id"
+        "HistoryTransaction", 
+        foreign_keys="HistoryTransaction.source_user_id", 
+        back_populates="source_user", 
+        lazy="joined"
     )
