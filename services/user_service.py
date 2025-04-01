@@ -117,7 +117,11 @@ def get_user_transactions_service(
         transaction_dict = {
             "id": transaction.id,
             "transaction_type": transaction.transaction_type,
+            "transaction_type_name": TransactionType(
+                transaction.transaction_type
+            ),
             "amount": transaction.amount,
+            "wallet_id": transaction.wallet_id,
             "source_user_id": transaction.source_user_id,
             "destination_user_id": transaction.destination_user_id,
             "created_at": transaction.created_at,
