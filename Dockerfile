@@ -1,23 +1,20 @@
-# Stage 1: Build dependencies
 FROM python:3.12-slim AS builder
 
 WORKDIR /app
 
-# Install build dependencies
 RUN apt-get update && apt-get install -y gcc build-essential && rm -rf /var/lib/apt/lists/*
 
-# Create a virtual environment
 ENV VIRTUAL_ENV=/opt/venv
 RUN python -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-# Install Python dependencies
 COPY requirements.txt requirements-dev.txt ./
 RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements-dev.txt
 
-# Copy application code
 COPY . .
 COPY alembic.ini /app/alembic.ini
+
+#generated with AI help
 
 # Stage 2: Final image
 FROM python:3.12-slim

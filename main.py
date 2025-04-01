@@ -5,8 +5,7 @@ from controllers.user_controller import user_router
 from controllers.wallet_controller import router as wallet_router
 
 app = FastAPI()
-# Base.metadata.create_all(bind=engine)
-# Uncomment this line to create all tables in the database
+
 
 app.include_router(user_router, prefix="/users", tags=["users"])
 app.include_router(login_router, prefix="/login", tags=["login"])

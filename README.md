@@ -1,22 +1,38 @@
-# Digital Wallet Backend Challenge
+# Digital Wallet Backend Challenge 🇺🇸
+
+[🇺🇸](#) | [🇧🇷](README-pt.md)
 
 This project implements a backend API for a digital wallet system using FastAPI and PostgreSQL containerized with Docker. The system allows for user management, authentication, and wallet operations.
 
 ## [Original Challenge](https://github.com/WL-Consultings/challenges/tree/main/backend)
 
 ## Justifications 
-<!-- alterar -->
 This implementation focuses on clean architecture, separation of concerns, and testability. The project uses FastAPI for its performance benefits and automatic documentation generation, SQLAlchemy for database operations, and Docker for consistent development and deployment environments.
 
-## 📋 Table of Contents
+Since the challenge completely disregards the front-end part, it wouldn't make sense to use a template layer, which would make Django like using a bazooka to kill a butterfly.
 
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-- [Additional Features](#additional-features)
-- [License](#license)
+Despite having previous experience and liking Django REST framework for its organization and testability, I believe its learning curve is much lower, with advantages such as ORM integration, native migrations, native user model, admin routes (these features would be underutilized in this pure API context) among other benefits. I chose to use FastAPI because of its [efficiency](https://fastapi.tiangolo.com/#performance) and simplicity. As proposed to run the system inside a container, choosing lighter dependencies directly means saving resources, adding these two factors, we can translate it as a money gain (thinking about hosting).
+
+In summary, I chose FastAPI due to:
+
+- Superior performance
+- Operational efficiency (lower resource consumption in containers)
+- Automatic validation and documentation (via type hints)
+- Native asynchronicity (for vertical scalability)
+- Smaller technical footprint (without unused components like admin/templates)
+
+## 📋 Table of Contents
+- [Digital Wallet Backend Challenge 🇺🇸](#digital-wallet-backend-challenge-)
+  - [Original Challenge](#original-challenge)
+  - [Justifications](#justifications)
+  - [📋 Table of Contents](#-table-of-contents)
+  - [✨ Features](#-features)
+  - [🛠️ Tech Stack](#️-tech-stack)
+  - [🚀 Getting Started](#-getting-started)
+    - [Prerequisites](#prerequisites)
+    - [Installation](#installation)
+  - [Additional Features](#additional-features)
+  - [License](#license)
 
 ## ✨ Features
 - User registration and authentication
@@ -29,7 +45,6 @@ This implementation focuses on clean architecture, separation of concerns, and t
 - Comprehensive test suite
 
 ## 🛠️ Tech Stack
-
 - ![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi) High-performance web framework for building APIs
 - ![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-CC2927?style=for-the-badge&logo=sqlalchemy&logoColor=white) SQL toolkit and ORM
 - ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white) Relational database
@@ -42,45 +57,38 @@ This implementation focuses on clean architecture, separation of concerns, and t
 ## 🚀 Getting Started
 
 ### Prerequisites
-
 - Docker and Docker Compose
-- Make (optional, for using Makefile commands)
 
 ### Installation
-
 1. Clone the repository
 ```bash
 git clone <repository-url>
 cd digital-wallet-backend-challenge
 ```
-
 2. Create a .env file from the template
 ```bash
 cp .env.template .env
 ```
-
 3. Build and start the containers
 ```bash
 make build
 make up
 ```
-
 4. Run database migrations
 ```bash
 make migrate
 ```
-
 5. (Optional) Seed the database with initial data
 ```bash
 make seed
 ```
-
 6. The API will be available at http://localhost:8000
+
+7. The Swagger docs will be available at http://localhost:8000/docs
 
 ## Additional Features
 Check for additional commands in the Makefile [Makefile]
 
 ## License
-
 This project is licensed under the [MIT License](LICENSE).
 
