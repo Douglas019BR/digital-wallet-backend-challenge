@@ -35,8 +35,8 @@ class User(Base):
         lazy="joined",
     )
     source_transactions = relationship(
-        "HistoryTransaction", 
-        foreign_keys="HistoryTransaction.source_user_id", 
-        back_populates="source_user", 
-        lazy="joined"
+        "HistoryTransaction",
+        foreign_keys="HistoryTransaction.source_user_id",
+        back_populates="source_user",
+        lazy="joined",
     )

@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 
+from models.history_transactions import HistoryTransaction, TransactionType
 from models.user import User
 from models.wallet import Wallet
 
@@ -36,7 +37,15 @@ def add_balance_service(
     if value < 0:
         raise Exception("The value can't be less than zero")
     wallet.balance += value
+    transaction = HistoryTransaction(
+        wallet_id=wallet.id,
+        source_user_id=current_user.id,
+        transaction_type=TransactionType.DEPOSIT,
+        amount=value,
+    )
+    db.add(transaction)
     db.commit()
+
     return wallet
 
 
@@ -66,6 +75,14 @@ def transfer_balance_service(
     try:
         source_wallet.balance -= amount
         destination_wallet.balance += amount
+        transaction = HistoryTransaction(
+            wallet_id=source_wallet.id,
+            source_user_id=current_user.id,
+            destination_user_id=destination_wallet.user_id,
+            transaction_type=TransactionType.TRANSFER,
+            amount=amount,
+        )
+        db.add(transaction)
         db.commit()
 
         return f"Successfully transferred {amount} {source_wallet.currency}. New balance: {source_wallet.balance}"
