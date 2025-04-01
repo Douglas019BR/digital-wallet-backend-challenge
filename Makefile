@@ -26,3 +26,15 @@ seed:
 
 test:
 	docker-compose exec web pytest -svv
+
+format:
+	ruff format .
+
+format-check:
+	ruff format --check --diff .
+
+imports-fix:
+	isort .
+
+imports-fix-check:
+	isort --check-only --diff .
