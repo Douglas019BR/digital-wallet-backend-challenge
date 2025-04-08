@@ -1,0 +1,56 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.12
+
+      - name: Install dependencies
+        run: make install-dev
+
+      - name: Build Docker image
+        run: make build
+
+      - name: Start services
+        run: make up
+
+      - name: Wait for services to be ready
+        run: |
+          until docker-compose exec db pg_isready -U postgres; do
+            echo "Waiting for database..."
+            sleep 5
+          done
+
+      - name: Run migrations
+        run: make migrate
+
+
+      - name: Run tests with coverage
+        run: make test-coverage
+
+      - name: Generate coverage badge
+        run: |
+          pip install coverage-badge
+          coverage-badge -o coverage.svg -f
+
+      - name: Upload coverage badge
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-badge
+          path: coverage.svg
