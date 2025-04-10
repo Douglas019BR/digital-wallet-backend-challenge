@@ -51,10 +51,22 @@ jobs:
           fi
 
       - name: Run migrations
-        run: make migrate
+        run: |
+          # Para ambientes CI/CD
+          if [ -n "$CI" ]; then
+            docker-compose exec -T web alembic upgrade head || docker compose exec -T web alembic upgrade head
+          else
+            make migrate
+          fi
 
       - name: Run tests with coverage
-        run: make test-coverage
+        run: |
+          # Para ambientes CI/CD
+          if [ -n "$CI" ]; then
+            docker-compose exec -T web pytest --cov=app || docker compose exec -T web pytest --cov=app
+          else
+            make test-coverage
+          fi
 
       - name: Generate coverage badge
         run: |
