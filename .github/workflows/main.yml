@@ -28,9 +28,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y docker-compose
 
-      - name: Install dependencies
-        run: make requirements
-
       - name: Build Docker image
         run: make build
 
@@ -43,6 +40,9 @@ jobs:
             echo "Waiting for database..."
             sleep 5
           done
+
+      - name: Install dependencies
+        run: make requirements
 
       - name: Run migrations
         run: make migrate
