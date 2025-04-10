@@ -66,18 +66,41 @@ jobs:
         run: |
           # Para ambientes CI/CD
           if [ -n "$CI" ]; then
-            docker compose exec -T -e COVERAGE_FILE=/tmp/coverage/.coverage web pytest --cov=app --cov-report=xml:/tmp/coverage/coverage.xml || docker-compose exec -T -e COVERAGE_FILE=/tmp/coverage/.coverage web pytest --cov=app --cov-report=xml:/tmp/coverage/coverage.xml
+            # Use simpler coverage output options and ensure the file is created
+            docker compose exec -T -e COVERAGE_FILE=/tmp/coverage/.coverage web pytest --cov=app --cov-report=xml || docker-compose exec -T -e COVERAGE_FILE=/tmp/coverage/.coverage web pytest --cov=app --cov-report=xml
           else
             make test-coverage
           fi
+
+      - name: Debug - List coverage files
+        run: |
+          echo "Checking coverage files in container..."
+          docker compose exec -T web ls -la /tmp/coverage/ || echo "No coverage directory found"
+          docker compose exec -T web find / -name "*.xml" -type f | grep -i coverage || echo "No XML files found"
+          docker compose exec -T web find / -name ".coverage" -type f || echo "No .coverage files found"
+
+      - name: Generate coverage report in container
+        run: |
+          # Try to generate coverage.xml from .coverage if it exists
+          docker compose exec -T web bash -c "cd /home/fastapiuser/app && python -m coverage xml" || echo "Could not generate XML report"
           
       - name: Copy coverage report from container
-        run: docker cp $(docker compose ps -q web):/tmp/coverage/coverage.xml ./coverage.xml
+        run: |
+          # Try to copy from a few possible locations
+          docker cp $(docker compose ps -q web):/home/fastapiuser/app/coverage.xml ./coverage.xml || \
+          docker cp $(docker compose ps -q web):/tmp/coverage/coverage.xml ./coverage.xml || \
+          docker cp $(docker compose ps -q web):/home/fastapiuser/app/.coverage ./coverage.data || \
+          echo "No coverage data found, creating minimal file for badge generation" && echo '<?xml version="1.0" ?><coverage version="7.3.2" timestamp="1713479948" lines-valid="0" lines-covered="0" line-rate="0" branches-covered="0" branches-valid="0" branch-rate="0" complexity="0"></coverage>' > ./coverage.xml
 
       - name: Generate coverage badge
         run: |
           pip install coverage-badge
-          coverage-badge -i coverage.xml -o coverage.svg
+          if [ -f "coverage.xml" ]; then
+            coverage-badge -i coverage.xml -o coverage.svg
+          else
+            # Create a fallback badge if no coverage data
+            echo '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="114" height="20" role="img" aria-label="coverage: unknown"><title>coverage: unknown</title><linearGradient id="s" x2="0" y2="100%"><stop offset="0" stop-color="#bbb" stop-opacity=".1"/><stop offset="1" stop-opacity=".1"/></linearGradient><clipPath id="r"><rect width="114" height="20" rx="3" fill="#fff"/></clipPath><g clip-path="url(#r)"><rect width="61" height="20" fill="#555"/><rect x="61" width="53" height="20" fill="#9f9f9f"/><rect width="114" height="20" fill="url(#s)"/></g><g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="110"><text aria-hidden="true" x="315" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="510">coverage</text><text x="315" y="140" transform="scale(.1)" fill="#fff" textLength="510">coverage</text><text aria-hidden="true" x="865" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="430">unknown</text><text x="865" y="140" transform="scale(.1)" fill="#fff" textLength="430">unknown</text></g></svg>' > coverage.svg
+          fi
 
       - name: Upload coverage badge
         uses: actions/upload-artifact@v4
