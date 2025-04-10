@@ -45,7 +45,7 @@ jobs:
         run: |
           # Para ambientes CI/CD
           if [ -n "$CI" ]; then
-            docker-compose exec -T web pip install -r requirements-dev.txt || docker compose exec -T web pip install -r requirements-dev.txt
+            docker compose exec -T web pip install -r requirements-dev.txt || docker-compose exec -T web pip install -r requirements-dev.txt
           else
             make requirements
           fi
@@ -54,24 +54,30 @@ jobs:
         run: |
           # Para ambientes CI/CD
           if [ -n "$CI" ]; then
-            docker-compose exec -T web alembic upgrade head || docker compose exec -T web alembic upgrade head
+            docker compose exec -T web alembic upgrade head || docker-compose exec -T web alembic upgrade head
           else
             make migrate
           fi
+
+      - name: Create coverage directory with proper permissions
+        run: docker compose exec -T web mkdir -p /tmp/coverage && docker compose exec -T web chmod 777 /tmp/coverage
 
       - name: Run tests with coverage
         run: |
           # Para ambientes CI/CD
           if [ -n "$CI" ]; then
-            docker-compose exec -T web pytest --cov=app || docker compose exec -T web pytest --cov=app
+            docker compose exec -T -e COVERAGE_FILE=/tmp/coverage/.coverage web pytest --cov=app --cov-report=xml:/tmp/coverage/coverage.xml || docker-compose exec -T -e COVERAGE_FILE=/tmp/coverage/.coverage web pytest --cov=app --cov-report=xml:/tmp/coverage/coverage.xml
           else
             make test-coverage
           fi
+          
+      - name: Copy coverage report from container
+        run: docker cp $(docker compose ps -q web):/tmp/coverage/coverage.xml ./coverage.xml
 
       - name: Generate coverage badge
         run: |
           pip install coverage-badge
-          coverage-badge -o coverage.svg -f
+          coverage-badge -i coverage.xml -o coverage.svg
 
       - name: Upload coverage badge
         uses: actions/upload-artifact@v4
