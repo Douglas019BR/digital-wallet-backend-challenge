@@ -42,7 +42,13 @@ jobs:
           done
 
       - name: Install dependencies
-        run: make requirements
+        run: |
+          # Para ambientes CI/CD
+          if [ -n "$CI" ]; then
+            docker-compose exec -T web pip install -r requirements-dev.txt || docker compose exec -T web pip install -r requirements-dev.txt
+          else
+            make requirements
+          fi
 
       - name: Run migrations
         run: make migrate
