@@ -28,7 +28,7 @@ test:
 	docker-compose exec web pytest -svv
 
 test-coverage:
-	docker-compose exec web pytest --cov=app --cov-report=xml:/tmp/coverage/coverage.xml
+	docker-compose exec -T web pytest --cov=app --cov-report=xml:/tmp/coverage/coverage.xml
 
 format:
 	ruff format .

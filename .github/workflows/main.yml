@@ -45,7 +45,7 @@ jobs:
         run: |
           # Para ambientes CI/CD
           if [ -n "$CI" ]; then
-            docker compose exec -T web pip install -r requirements-dev.txt || docker-compose exec -T web pip install -r requirements-dev.txt
+            docker compose exec -T web pip install -r requirements-dev.txt || docker compose exec -T web pip install -r requirements-dev.txt
           else
             make requirements
           fi
@@ -54,7 +54,7 @@ jobs:
         run: |
           # Para ambientes CI/CD
           if [ -n "$CI" ]; then
-            docker compose exec -T web alembic upgrade head || docker-compose exec -T web alembic upgrade head
+            docker compose exec -T web alembic upgrade head || docker compose exec -T web alembic upgrade head
           else
             make migrate
           fi
