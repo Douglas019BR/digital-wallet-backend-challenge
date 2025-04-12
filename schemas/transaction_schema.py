@@ -15,6 +15,6 @@ class TransactionResponse(BaseModel):
     destination_user_id: Optional[int] = None
     is_receiver: bool = False
 
-    class Config:
+    class ConfigDict:
         orm_mode = True
         json_encoders = {datetime: lambda dt: dt.isoformat() if dt else None}

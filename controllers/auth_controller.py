@@ -27,7 +27,7 @@ class LoginSchema(BaseModel):
 
 def create_access_token(data: dict, expires_delta: float = None) -> str:
     to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + timedelta(
+    expire = datetime.utcnow() + timedelta(
         minutes=expires_delta or ACCESS_TOKEN_EXPIRE_MINUTES
     )
     to_encode.update({"exp": expire})
