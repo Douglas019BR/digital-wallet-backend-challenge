@@ -55,11 +55,13 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-          docker compose exec -T -e COVERAGE_FILE=/tmp/coverage/.coverage web pytest --cov=app --cov-report=xml:/tmp/coverage/coverage.xml || \
-          docker-compose exec -T -e COVERAGE_FILE=/tmp/coverage/.coverage web pytest --cov=app --cov-report=xml:/tmp/coverage/coverage.xml
+          docker compose exec -T -e COVERAGE_FILE=/tmp/coverage/.coverage web pytest --cov=app
+          docker compose exec -T web coverage xml -o /tmp/coverage/coverage.xml
 
       - name: Debug - List coverage files
         run: |
+          docker compose exec -T web ls -la
+          echo "#################"
           echo "Checking coverage files in container..."
           docker compose exec -T web ls -la /tmp/coverage/ || echo "No coverage directory found"
 
