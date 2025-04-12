@@ -1,39 +1,115 @@
-version: '3.8'
+name: CI/CD Pipeline
 
-services:
-  db:
-    image: postgres:15
-    container_name: postgres-db
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: digital-wallet
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
+on:
+  push:
+    branches: [main, pipeline]
+  pull_request:
+    branches: [main]
 
-  web:
-    build:
-      context: .
-    container_name: fastapi-app
-    environment:
-      DATABASE_URL: postgresql://postgres:password@db:5432/digital-wallet
-    ports:
-      - "8000:8000"
-    volumes:
-      - .:/home/fastapiuser/app  # Mount local code for hot reload
-    depends_on:
-      db:
-        condition: service_healthy
-    restart: unless-stopped
+jobs:
+  build:
+    name: 🛠 Build & Setup
+    runs-on: ubuntu-latest
 
-volumes:
-  postgres_data:
-    name: digital-wallet-db-data
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.12
+
+      - name: Setup Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+
+      - name: Build containers
+        run: make build
+
+      - name: Start services
+        run: make up
+
+      - name: Wait for DB (via healthcheck)
+        run: |
+          echo "Aguardando container DB ficar saudável..."
+          timeout 90s bash -c '
+            until [ "$(docker inspect --format "{{.State.Health.Status}}" $(docker compose ps -q db))" == "healthy" ]; do
+              echo "Aguardando DB..."
+              sleep 5
+            done
+          '
+
+  test:
+    name: ✅ Run Tests
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Start services
+        run: make up
+
+      - name: Install dev dependencies
+        run: |
+          docker compose exec -T web pip install -r requirements-dev.txt
+
+      - name: Run Alembic migrations
+        run: |
+          docker compose exec -T web alembic upgrade head
+
+      - name: Create /tmp/coverage dir
+        run: |
+          docker compose exec -T web mkdir -p /tmp/coverage
+          docker compose exec -T web chmod 777 /tmp/coverage
+
+      - name: Run tests with coverage
+        run: |
+          docker compose exec -T web pip install pytest-cov
+          docker compose exec -T -e COVERAGE_FILE=/tmp/coverage/.coverage web \
+            pytest --cov=. --cov-report=xml
+          docker compose exec -T web \
+            coverage xml -o /tmp/coverage/coverage.xml
+
+      - name: Copy coverage file
+        run: |
+          docker cp $(docker compose ps -q web):/tmp/coverage/coverage.xml ./coverage.xml || \
+          echo '<?xml version="1.0"?><coverage version="7.3.2" timestamp="1713479948" lines-valid="0" lines-covered="0" line-rate="0" branches-covered="0" branches-valid="0" branch-rate="0" complexity="0"></coverage>' > ./coverage.xml
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage.xml
+
+  coverage-badge:
+    name: 📊 Generate Coverage Badge
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Download coverage report
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-report
+          path: .
+
+      - name: Install coverage-badge
+        run: pip install coverage-badge
+
+      - name: Generate badge
+        run: |
+          if [ -f "coverage.xml" ]; then
+            coverage-badge -i coverage.xml -o coverage.svg
+          else
+            echo '<svg xmlns="http://www.w3.org/2000/svg"...>...</svg>' > coverage.svg
+          fi
+
+      - name: Upload badge artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-badge
+          path: coverage.svg
