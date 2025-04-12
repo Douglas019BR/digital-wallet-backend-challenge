@@ -23,6 +23,7 @@ COPY alembic.ini /app/alembic.ini
 FROM python:3.12-slim
 
 # Create a non-root user
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 RUN useradd -ms /bin/bash fastapiuser
 
 # Set up virtual environment
