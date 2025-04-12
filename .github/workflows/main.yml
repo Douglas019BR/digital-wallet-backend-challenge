@@ -55,14 +55,13 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-          echo "checking pytest-cov instalation"
-          pip list | grep pytest-cov
+          echo "checking pytest-cov installation"
+          docker compose exec -T web pip list | grep pytest-cov || docker compose exec -T web pip install pytest-cov
           echo "running tests with coverage"
           docker compose exec -T -e COVERAGE_FILE=/tmp/coverage/.coverage web \
             pytest --cov=app
           docker compose exec -T web \
             coverage xml -o /tmp/coverage/coverage.xml -d /tmp/coverage
-
 
       - name: Debug - List coverage files
         run: |
