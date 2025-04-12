@@ -60,8 +60,9 @@ jobs:
           echo "running tests with coverage"
           docker compose exec -T -e COVERAGE_FILE=/tmp/coverage/.coverage web \
             pytest --cov=app
+          echo "generating xml coverage report"
           docker compose exec -T web \
-            coverage xml -o /tmp/coverage/coverage.xml -d /tmp/coverage
+            coverage xml -o /tmp/coverage/coverage.xml
 
       - name: Debug - List coverage files
         run: |
