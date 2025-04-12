@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from models.history_transactions import HistoryTransaction, TransactionType
 
@@ -73,7 +73,7 @@ def test_get_transactions_by_type(
 def test_get_transactions_by_date_range(
     test_client, valid_token, db_session, test_user
 ):
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     old_transaction = HistoryTransaction(
         source_user_id=test_user.id,
         wallet_id=test_user.wallets[0].id,
@@ -117,7 +117,7 @@ def test_get_transactions_by_date_range(
 def test_get_transactions_combined_filters(
     test_client, valid_token, db_session, test_user
 ):
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
 
     old_deposit = HistoryTransaction(
         source_user_id=test_user.id,
