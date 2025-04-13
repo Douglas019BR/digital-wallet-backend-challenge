@@ -9,6 +9,10 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+
+
 jobs:
   ci-pipeline:
     runs-on: ubuntu-latest
