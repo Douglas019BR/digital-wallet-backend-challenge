@@ -65,7 +65,7 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-          docker compose exec -T web pytest --cov=. --cov-report=xml --cov-config=.coveragerc
+          docker compose exec -T web pytest --cov=. --cov-report=xml
           docker compose exec -T web mv coverage.xml tmp/coverage/coverage.xml
 
       - name: Generate coverage badge inside container
