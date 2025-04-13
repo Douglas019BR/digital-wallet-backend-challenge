@@ -57,24 +57,25 @@ jobs:
         run: |
           docker compose exec -T web alembic upgrade head
 
-      - name: Create coverage directory
+      - name: Create coverage directory and set permissions
         run: |
           docker compose exec -T --user=root web mkdir -p tmp/coverage && \
-          docker-compose exec -T --user=root web chmod -R 777 tmp/coverage
+          docker compose exec -T --user=root web chmod -R 777 tmp/coverage && \
+          docker compose exec -T --user=root web chmod -R 777 /home/fastapiuser/app
 
       - name: Run tests with coverage
         run: |
-          docker compose exec -T web pytest --cov=. --cov-report=xml
+          docker compose exec -T web pytest --cov=. --cov-report=xml --cov-config=.coveragerc
           docker compose exec -T web mv coverage.xml tmp/coverage/coverage.xml
 
       - name: Generate coverage badge inside container
         run: |
-          docker compose exec -T --user=root web pip install coverage-badge
+          docker compose exec -T web pip install coverage-badge
           docker compose exec -T web coverage-badge -o tmp/coverage/coverage.svg -f
           
       - name: Copy coverage report
         run: |
-          docker cp $(docker compose -T ps -q web):/home/fastapiuser/app/tmp/coverage/coverage.svg ./coverage.svg
+          docker cp $(docker compose ps -q web):/home/fastapiuser/app/tmp/coverage/coverage.svg ./coverage.svg
 
 
       - name: Upload coverage badge
