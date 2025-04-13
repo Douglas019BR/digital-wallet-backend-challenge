@@ -59,27 +59,45 @@ jobs:
 
       - name: Create coverage directory
         run: |
-          docker compose exec -T web mkdir -p /tmp/coverage && \
-          docker compose exec -T web chmod -R 777 /tmp/coverage
+          docker compose exec -T web mkdir -p tmp/coverage && \
+          docker-compose exec -T web chmod -R 777 tmp/coverage
 
       - name: Run tests with coverage
         run: |
           docker compose exec -T web pytest --cov=. --cov-report=xml
-          docker compose exec -T web coverage xml -o /tmp/coverage/coverage.xml
+          docker compose exec -T web mv coverage.xml tmp/coverage/coverage.xml
 
+      - name: Generate coverage badge inside container
+        run: |
+          docker compose exec -T --user=root web pip install coverage-badge
+          docker compose exec -T web coverage-badge -o tmp/coverage/coverage.svg -f
+          
       - name: Copy coverage report
         run: |
-          docker cp $(docker compose ps -q web):/tmp/coverage/coverage.xml ./coverage.xml || \
-          echo '<?xml version="1.0"?><coverage version="7.3.2" lines-valid="0" lines-covered="0" line-rate="0"></coverage>' > coverage.xml
+          docker cp $(docker compose -T ps -q web):/home/fastapiuser/app/tmp/coverage/coverage.svg ./coverage.svg
 
-      - name: Generate coverage badge
-        run: |
-          pip install coverage-badge
-          coverage-badge -i coverage.xml -o coverage.svg || echo "Falha ao gerar badge, gerando dummy..."
-          [ -f coverage.svg ] || echo '<svg xmlns="http://www.w3.org/2000/svg" width="100" height="20"><text x="0" y="15">Coverage: unknown</text></svg>' > coverage.svg
 
       - name: Upload coverage badge
         uses: actions/upload-artifact@v4
         with:
           name: coverage-badge
           path: coverage.svg
+
+
+  coverage-badge:
+    runs-on: ubuntu-latest
+    needs: ci-pipeline
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Commit coverage
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git checkout -B coverage-badge
+          cp coverage.svg coverage.svg
+          git add coverage.svg
+          git commit -m "chore: update coverage badge"
+          git push origin coverage-badge -f
