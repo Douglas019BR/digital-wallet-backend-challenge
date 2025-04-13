@@ -1,5 +1,5 @@
 # Desafio Backend de Carteira Digital 🇧🇷
-
+![Coverage](https://github.com/Douglas019BR/digital-wallet-backend-challenge/blob/coverage-badge/coverage.svg)
 [🇧🇷](#) | [🇺🇸](README.md)
 
 Este projeto implementa uma API backend para um sistema de carteira digital usando FastAPI e PostgreSQL containerizado com Docker. O sistema permite gerenciamento de usuários, autenticação e operações de carteira.

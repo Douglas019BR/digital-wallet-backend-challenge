@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel, FieldValidationInfo, field_validator
+from pydantic import BaseModel, ValidationInfo, field_validator
 
 
 class UserBase(BaseModel):
@@ -17,7 +17,7 @@ class UserCreate(UserBase):
     parent_id: int | None = None
 
     @field_validator("username", "email", "password", mode="before")
-    def validate_not_empty(cls, value, info: FieldValidationInfo):
+    def validate_not_empty(cls, value, info: ValidationInfo):
         if not value or not str(value).strip():
             raise ValueError(
                 f"The field '{info.field_name}' can not be empty."

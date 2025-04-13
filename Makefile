@@ -1,4 +1,4 @@
-.PHONY: build up down restart migrate seed test
+.PHONY: build up down restart migrate seed test test-coverage
 
 build:
 	docker-compose build
@@ -26,6 +26,9 @@ seed:
 
 test:
 	docker-compose exec web pytest -svv
+
+test-coverage:
+	docker-compose exec -T web pytest --cov=app --cov-report=xml:/tmp/coverage/coverage.xml
 
 format:
 	ruff format .

@@ -175,3 +175,7 @@ cython_debug/
 
 
 .env
+coverage.svg
+/tmp/
+tmp/
+.coverage

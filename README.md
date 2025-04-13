@@ -1,5 +1,5 @@
 # Digital Wallet Backend Challenge 🇺🇸
-
+![Coverage](https://github.com/Douglas019BR/digital-wallet-backend-challenge/blob/coverage-badge/coverage.svg)
 [🇺🇸](#) | [🇧🇷](README-pt.md)
 
 This project implements a backend API for a digital wallet system using FastAPI and PostgreSQL containerized with Docker. The system allows for user management, authentication, and wallet operations.
@@ -110,4 +110,3 @@ Check for additional commands in the [Makefile](Makefile)
 
 ## 📄 License
 This project is licensed under the [MIT License](LICENSE).
-
