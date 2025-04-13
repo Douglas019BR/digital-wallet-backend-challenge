@@ -60,7 +60,7 @@ jobs:
       - name: Create coverage directory and set permissions
         run: |
           docker compose exec -T --user=root web mkdir -p tmp/coverage && \
-          docker compose exec -T --user=root web chmod -R 777 tmp/coverage && \
+          docker compose exec -T --user=root web chmod -R 777 tmp/coverage
 
       - name: Run tests with coverage
         run: |
