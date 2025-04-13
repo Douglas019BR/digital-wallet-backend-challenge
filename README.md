@@ -1,4 +1,4 @@
-# Digital Wallet Backend Challenge
+# Digital Wallet Backend Challenge ![Coverage](https://github.com/Douglas019BR/digital-wallet-backend-challenge/blob/coverage-badge/coverage.svg)
 
 This project implements a backend API for a digital wallet system using FastAPI and PostgreSQL containerized with Docker. The system allows for user management, authentication, and wallet operations.
 
@@ -10,13 +10,17 @@ This implementation focuses on clean architecture, separation of concerns, and t
 
 ## 📋 Table of Contents
 
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-- [Additional Features](#additional-features)
-- [License](#license)
+- [Digital Wallet Backend Challenge ](#digital-wallet-backend-challenge-)
+  - [Original Challenge](#original-challenge)
+  - [Justifications](#justifications)
+  - [📋 Table of Contents](#-table-of-contents)
+  - [✨ Features](#-features)
+  - [🛠️ Tech Stack](#️-tech-stack)
+  - [🚀 Getting Started](#-getting-started)
+    - [Prerequisites](#prerequisites)
+    - [Installation](#installation)
+  - [Additional Features](#additional-features)
+  - [License](#license)
 
 ## ✨ Features
 - User registration and authentication
