@@ -59,8 +59,8 @@ jobs:
 
       - name: Create coverage directory
         run: |
-          docker compose exec -T web mkdir -p tmp/coverage && \
-          docker-compose exec -T web chmod -R 777 tmp/coverage
+          docker compose exec -T --user=root web mkdir -p tmp/coverage && \
+          docker-compose exec -T --user=root web chmod -R 777 tmp/coverage
 
       - name: Run tests with coverage
         run: |
@@ -97,7 +97,6 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git checkout -B coverage-badge
-          cp coverage.svg coverage.svg
           git add coverage.svg
           git commit -m "chore: update coverage badge"
           git push origin coverage-badge -f
